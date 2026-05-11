@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
         subject: true,
         otp_code: true,
         received_at: true,
-        raw_body: false, // Don't send raw body in list view
+        raw_body: true,
       },
     });
 
@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
           otp_code: m.otp_code,
           received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
           has_body: true,
+          raw_body: m.raw_body,
         })),
         email: generatedEmail.generated_email,
       },

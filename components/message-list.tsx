@@ -9,12 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Inbox, Loader2 } from "lucide-react";
+import { Inbox, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
+import { CopyButton } from "@/components/copy-button";
 
 export function MessageList() {
   const { data, isLoading, isError } = useMessages();
   const messages = data?.messages ?? [];
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   return (
     <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
@@ -49,34 +52,52 @@ export function MessageList() {
           </div>
         )}
 
-        {messages.map((msg) => (
+        {messages.map((msg: any) => (
           <div
             key={msg.id}
-            className="group flex items-start gap-3 p-3 rounded-lg border border-border/40 hover:border-border/70 hover:bg-muted/30 transition-all duration-150"
+            className="group flex flex-col p-3 rounded-lg border border-border/40 hover:border-border/70 hover:bg-muted/30 transition-all duration-150 cursor-pointer"
+            onClick={() => setExpandedId(expandedId === msg.id ? null : msg.id)}
           >
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <p className="text-xs font-medium text-muted-foreground truncate">
-                  {msg.sender ?? "Unknown sender"}
+            <div className="flex items-start gap-3 w-full">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-medium text-muted-foreground truncate">
+                      {msg.sender ?? "Unknown sender"}
+                    </p>
+                    {msg.otp_code && (
+                      <div className="flex items-center gap-1.5">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] shrink-0 font-mono"
+                        >
+                          OTP: {msg.otp_code}
+                        </Badge>
+                        <CopyButton text={msg.otp_code} size="icon" className="h-5 w-5 [&_svg]:h-3 [&_svg]:w-3" />
+                      </div>
+                    )}
+                  </div>
+                  {expandedId === msg.id ? (
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+                <p className="text-sm truncate text-foreground/80">
+                  {msg.subject ?? "(no subject)"}
                 </p>
-                {msg.otp_code && (
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] shrink-0 font-mono"
-                  >
-                    OTP: {msg.otp_code}
-                  </Badge>
-                )}
+                <p className="text-[10px] text-muted-foreground/40 mt-1 tabular-nums">
+                  {formatDistanceToNow(new Date(msg.received_at), {
+                    addSuffix: true,
+                  })}
+                </p>
               </div>
-              <p className="text-sm truncate text-foreground/80">
-                {msg.subject ?? "(no subject)"}
-              </p>
-              <p className="text-[10px] text-muted-foreground/40 mt-1 tabular-nums">
-                {formatDistanceToNow(new Date(msg.received_at), {
-                  addSuffix: true,
-                })}
-              </p>
             </div>
+            {expandedId === msg.id && (
+              <div className="mt-3 pt-3 border-t border-border/30 text-xs text-muted-foreground whitespace-pre-wrap font-mono">
+                {msg.raw_body || "No content."}
+              </div>
+            )}
           </div>
         ))}
       </CardContent>

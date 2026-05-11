@@ -69,35 +69,17 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background ambient blobs */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-      >
-        <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(circle, oklch(0.63 0.20 264 / 8%) 0%, transparent 70%)" }}
-        />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full"
-          style={{ background: "radial-gradient(circle, oklch(0.63 0.20 280 / 6%) 0%, transparent 70%)" }}
-        />
-        {/* Subtle dot grid */}
-        <div className="absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage: "radial-gradient(circle, oklch(1 0 0) 1px, transparent 1px)",
-            backgroundSize: "28px 28px",
-          }}
-        />
-      </div>
+      {/* Simple refined background instead of noisy blobs */}
+      <div className="absolute inset-0 bg-background pointer-events-none" aria-hidden="true" />
+      
+      {/* Top subtle highlight */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
       <div className="relative w-full max-w-[400px]">
         {/* Brand header */}
         <div className="flex flex-col items-center mb-8 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl mb-5 shadow-xl"
-            style={{
-              background: "linear-gradient(135deg, oklch(0.63 0.20 264), oklch(0.55 0.22 285))",
-              boxShadow: "0 8px 32px oklch(0.63 0.20 264 / 35%)",
-            }}
-          >
-            <Mail className="h-7 w-7 text-white" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl mb-6 shadow-sm border border-border/50 bg-card">
+            <Mail className="h-6 w-6 text-primary" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight" style={{ letterSpacing: "-0.02em" }}>
             TMail
@@ -109,12 +91,10 @@ export default function LoginPage() {
 
         {/* Card */}
         <Card
-          className="border shadow-2xl"
+          className="border shadow-lg"
           style={{
-            background: "oklch(0.17 0.025 264 / 95%)",
-            borderColor: "oklch(1 0 0 / 10%)",
-            backdropFilter: "blur(24px)",
-            boxShadow: "0 24px 64px oklch(0 0 0 / 40%), 0 0 0 1px oklch(1 0 0 / 5%)",
+            background: "oklch(0.15 0.02 264)", // Solid clean background instead of glassmorphism
+            borderColor: "oklch(1 0 0 / 8%)",
           }}
         >
           <CardHeader className="pb-0 pt-7 px-7">
@@ -200,13 +180,11 @@ export default function LoginPage() {
               {/* Submit */}
               <Button
                 type="submit"
-                className="w-full h-11 font-semibold text-sm mt-1 shadow-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
+                className="w-full h-11 font-medium text-sm mt-2 transition-colors hover:bg-primary/90"
                 disabled={loading || !email || !password}
                 style={{
-                  background: loading
-                    ? undefined
-                    : "linear-gradient(135deg, oklch(0.63 0.20 264), oklch(0.55 0.22 285))",
-                  boxShadow: !loading ? "0 4px 20px oklch(0.63 0.20 264 / 40%)" : undefined,
+                  background: loading ? undefined : "oklch(0.63 0.20 264)",
+                  color: "white",
                 }}
               >
                 {loading ? (

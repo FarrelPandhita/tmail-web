@@ -5,10 +5,11 @@ import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CopyButton } from "@/components/copy-button";
-import { ArrowLeft, Mail, User, CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Mail, User, CheckCircle2, XCircle, ShieldCheck, HeartPulse } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SuperadminRawMessageViewer } from "@/components/superadmin-raw-viewer";
+import { getHealthBadge } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Inbox Detail" };
 
@@ -85,6 +86,20 @@ export default async function SuperadminInboxDetailPage({
             <span className="text-xs text-muted-foreground">
               Created {email.created_at ? new Date(email.created_at).toLocaleDateString() : "Unknown"}
             </span>
+            {(() => {
+              const lastMsg = email.inbox_messages[0];
+              const health = getHealthBadge(
+                email.is_active, 
+                email.created_at, 
+                lastMsg ? lastMsg.received_at : null
+              );
+              return (
+                <Badge variant="outline" className={`${health.color} text-[10px]`}>
+                  <HeartPulse className="h-3 w-3 mr-1" />
+                  {health.status}
+                </Badge>
+              );
+            })()}
           </div>
         </div>
         <Badge variant="outline" className="text-amber-400 border-amber-400/30 bg-amber-400/5">

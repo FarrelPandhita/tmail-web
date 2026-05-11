@@ -31,6 +31,14 @@ export async function PATCH(
         data: { is_active: !email.is_active },
       });
 
+      await prisma.audit_logs.create({
+        data: {
+          admin_id: Number(session.sub),
+          action: updated.is_active ? "ENABLE_EMAIL" : "DISABLE_EMAIL",
+          target_email: email.generated_email,
+        },
+      });
+
       return NextResponse.json({
         ok: true,
         data: { id: updated.id, is_active: updated.is_active },
@@ -53,10 +61,21 @@ export async function PATCH(
         parallelism: 1,
       });
 
+      const email = await prisma.generated_emails.findUnique({ where: { id }, select: { generated_email: true } });
       await prisma.generated_emails.update({
         where: { id },
         data: { password_hash },
       });
+
+      if (email) {
+        await prisma.audit_logs.create({
+          data: {
+            admin_id: Number(session.sub),
+            action: "RESET_PASSWORD",
+            target_email: email.generated_email,
+          },
+        });
+      }
 
       return NextResponse.json({ ok: true });
     }
@@ -109,6 +128,47 @@ export async function GET(
     });
   } catch (err) {
     console.error("[admin/emails/[id] GET] error:", err);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
+  }
+}
+
+// DELETE /api/admin/emails/[id] — delete generated email (Superadmin only)
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getSessionFromRequest(req);
+    // Ensure only superadmin can delete emails
+    if (!session || session.role !== "superadmin") {
+      return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+    }
+
+    const { id: idStr } = await params;
+    const id = parseInt(idStr, 10);
+
+    const email = await prisma.generated_emails.findUnique({ where: { id } });
+    if (!email) {
+      return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
+    }
+
+    // Delete in transaction to handle relations since we don't have Cascade delete set up
+    await prisma.$transaction([
+      prisma.inbox_messages.deleteMany({ where: { generated_email_id: id } }),
+      prisma.otp_cache.deleteMany({ where: { generated_email_id: id } }),
+      prisma.generated_emails.delete({ where: { id } }),
+      prisma.audit_logs.create({
+        data: {
+          admin_id: Number(session.sub),
+          action: "DELETE_EMAIL",
+          target_email: email.generated_email,
+        },
+      }),
+    ]);
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("[admin/emails/[id] DELETE] error:", err);
     return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
 }

@@ -116,6 +116,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await prisma.audit_logs.create({
+      data: {
+        admin_id: Number(session.sub),
+        action: "CREATE_EMAIL",
+        target_email: emailAddress,
+      },
+    });
+
     return NextResponse.json(
       {
         ok: true,

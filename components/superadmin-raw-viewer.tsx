@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/copy-button";
 import { InboxMessageFull } from "@/types";
-import { ChevronDown, ChevronUp, Mail, Code } from "lucide-react";
+import { ChevronDown, ChevronUp, Mail, Code, Globe, Timer } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, detectProvider, getOtpExpiryBadge } from "@/lib/utils";
 
 interface SuperadminRawMessageViewerProps {
   messages: InboxMessageFull[];
@@ -68,19 +68,37 @@ export function SuperadminRawMessageViewer({
                     })}
                   </span>
                 </div>
-                <p className="text-sm text-foreground/80 mt-0.5 truncate">
-                  {msg.subject ?? "(no subject)"}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-sm text-foreground/80 truncate">
+                    {msg.subject ?? "(no subject)"}
+                  </p>
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 ml-2 border-border/50 text-muted-foreground bg-muted/20">
+                    <Globe className="h-2.5 w-2.5 mr-1" />
+                    {detectProvider(msg.sender, msg.subject)}
+                  </Badge>
+                </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {msg.otp_code && (
-                  <CopyButton text={msg.otp_code} label="OTP" size="sm" />
-                )}
-                {expandedId === msg.id ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const expiry = getOtpExpiryBadge(msg.received_at);
+                    if (!expiry) return null;
+                    return (
+                      <Badge variant="outline" className={`${expiry.color} text-[9px] px-1.5 py-0 h-4`}>
+                        <Timer className="h-2.5 w-2.5 mr-1" />
+                        {expiry.status}
+                      </Badge>
+                    );
+                  })()}
+                  {msg.otp_code && (
+                    <CopyButton text={msg.otp_code} label="OTP" size="sm" />
+                  )}
+                  {expandedId === msg.id ? (
+                    <ChevronUp className="h-4 w-4 text-muted-foreground ml-1" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground ml-1" />
+                  )}
+                </div>
               </div>
             </div>
 

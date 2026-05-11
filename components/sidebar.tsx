@@ -39,6 +39,7 @@ const navByRole: Record<string, NavItem[]> = {
   superadmin: [
     { label: "Overview", href: "/superadmin", icon: LayoutDashboard },
     { label: "Global Inbox", href: "/superadmin/inbox", icon: Inbox },
+    { label: "Email Manager", href: "/generator", icon: Mail },
     { label: "Search", href: "/superadmin/search", icon: Search },
     { label: "Audit Logs", href: "/superadmin/audit", icon: Activity },
   ],
@@ -104,7 +105,7 @@ export function Sidebar({ role, email }: SidebarProps) {
         {navItems.map((item) => {
           const isActive =
             item.href === pathname ||
-            (item.href !== "/" && pathname.startsWith(item.href));
+            (item.href !== "/superadmin" && item.href !== "/dashboard" && item.href !== "/generator" && item.href !== "/" && pathname.startsWith(item.href + "/"));
 
           return (
             <Link key={item.href + item.label} href={item.href}>

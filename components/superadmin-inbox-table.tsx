@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, CheckCircle2, XCircle, Inbox } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 import { GeneratedEmailSummary } from "@/types";
+import { getEmailAgeDetails } from "@/lib/utils";
 
 interface SuperadminInboxTableProps {
   emails: GeneratedEmailSummary[];
@@ -36,7 +37,7 @@ export function SuperadminInboxTable({ emails }: SuperadminInboxTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="border-border/40">
-              <TableHead className="pl-6">Email Address</TableHead>
+              <TableHead className="pl-6">Email / Age</TableHead>
               <TableHead>Buyer</TableHead>
               <TableHead>Latest OTP</TableHead>
               <TableHead>Messages</TableHead>
@@ -49,9 +50,17 @@ export function SuperadminInboxTable({ emails }: SuperadminInboxTableProps) {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="text-center text-muted-foreground py-12"
+                  className="text-center py-16"
                 >
-                  No emails found.
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <Inbox className="h-6 w-6 text-primary/60" />
+                    </div>
+                    <h3 className="text-sm font-medium text-foreground">No emails found</h3>
+                    <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                      There are no generated emails matching your criteria.
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -73,6 +82,19 @@ export function SuperadminInboxTable({ emails }: SuperadminInboxTableProps) {
                       size="icon"
                       label=""
                     />
+                  </div>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-[10px] text-muted-foreground">
+                      {new Date(email.created_at).toLocaleDateString()}
+                    </span>
+                    {(() => {
+                      const age = getEmailAgeDetails(email.created_at);
+                      return (
+                        <Badge variant="outline" className={`text-[9px] px-1.5 py-0 border ${age.color}`}>
+                          {age.days}d ({age.status})
+                        </Badge>
+                      );
+                    })()}
                   </div>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">

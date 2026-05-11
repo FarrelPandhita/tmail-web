@@ -46,9 +46,9 @@ export default async function GeneratorDashboardPage() {
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-6xl">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Generator Admin</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Email Manager</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage generated email addresses and buyer assignments.
+          Manage generated email addresses, buyer assignments, and lifecycles.
         </p>
       </div>
 
@@ -69,6 +69,7 @@ export default async function GeneratorDashboardPage() {
       </div>
 
       <GeneratorEmailTable
+        role={session.role}
         emails={recentEmails.map((e) => ({
           id: e.id,
           generated_email: e.generated_email,
