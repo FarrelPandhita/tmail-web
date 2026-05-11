@@ -1,0 +1,79 @@
+// ============================================================
+// TMail Web — Prisma Schema
+// ============================================================
+// IMPORTANT: This schema was hand-written based on the known
+// existing database structure. On first VPS deployment, run:
+//   npx prisma db pull
+// to sync with the real column types and constraints.
+// DO NOT run prisma migrate — the DB already exists.
+// Use prisma db push ONLY if you need to add new columns.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model admins {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  password_hash String
+  role          String       // "superadmin" | "generator_admin"
+  is_superadmin Boolean      @default(false)
+  created_at    DateTime     @default(now())
+  audit_logs    audit_logs[]
+}
+
+model buyers {
+  id               String             @id @default(uuid())
+  username         String             @unique
+  created_at       DateTime           @default(now())
+  is_active        Boolean            @default(true)
+  generated_emails generated_emails[]
+}
+
+model generated_emails {
+  id              String          @id @default(uuid())
+  buyer_id        String?
+  generated_email String          @unique
+  password_hash   String
+  is_active       Boolean         @default(true)
+  created_by      String?         // admin id who created
+  created_at      DateTime        @default(now())
+  buyer           buyers?         @relation(fields: [buyer_id], references: [id])
+  inbox_messages  inbox_messages[]
+  otp_cache       otp_cache[]
+}
+
+model inbox_messages {
+  id                  String           @id @default(uuid())
+  generated_email_id  String
+  sender              String?
+  recipient           String?
+  subject             String?
+  raw_body            String?
+  otp_code            String?
+  received_at         DateTime         @default(now())
+  generated_email     generated_emails @relation(fields: [generated_email_id], references: [id])
+}
+
+model otp_cache {
+  id                  String           @id @default(uuid())
+  generated_email_id  String           @unique
+  latest_otp          String?
+  source              String?
+  updated_at          DateTime         @updatedAt
+  generated_email     generated_emails @relation(fields: [generated_email_id], references: [id])
+}
+
+model audit_logs {
+  id           String   @id @default(uuid())
+  admin_id     String
+  action       String
+  target_email String?
+  created_at   DateTime @default(now())
+  admin        admins   @relation(fields: [admin_id], references: [id])
+}
