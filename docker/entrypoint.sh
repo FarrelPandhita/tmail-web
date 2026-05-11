@@ -33,8 +33,13 @@ if [ -z "$DATABASE_URL" ]; then
     exit 1
   fi
   
-  export DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-  echo "[entrypoint] Constructed DATABASE_URL from separate variables"
+  # URL-encode the password — handles special chars like +, =, @, #, %
+  # These break PostgreSQL connection URLs if not encoded
+  DB_PASS_ENCODED=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$DB_PASS" 2>/dev/null || echo "$DB_PASS")
+  DB_USER_ENCODED=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$DB_USER" 2>/dev/null || echo "$DB_USER")
+  
+  export DATABASE_URL="postgresql://${DB_USER_ENCODED}:${DB_PASS_ENCODED}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+  echo "[entrypoint] Constructed DATABASE_URL from separate variables (host: ${DB_HOST})"
 else
   echo "[entrypoint] Using existing DATABASE_URL"
 fi
