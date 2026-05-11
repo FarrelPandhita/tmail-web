@@ -15,9 +15,9 @@ export function useOtpPoll() {
   return useQuery({
     queryKey: ["buyer-otp"],
     queryFn: fetchOtp,
-    refetchInterval: 5000, // Poll every 5 seconds — no WebSocket needed
-    refetchIntervalInBackground: false, // Stop polling when tab not focused
-    staleTime: 4000,
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true, // Keep polling even when tab is not focused
+    staleTime: 0,
     retry: 2,
   });
 }

@@ -13,6 +13,7 @@ import { Inbox, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { CopyButton } from "@/components/copy-button";
+import { stripHtml } from "@/lib/utils";
 
 export function MessageList() {
   const { data, isLoading, isError } = useMessages();
@@ -94,8 +95,14 @@ export function MessageList() {
               </div>
             </div>
             {expandedId === msg.id && (
-              <div className="mt-3 pt-3 border-t border-border/30 text-xs text-muted-foreground whitespace-pre-wrap font-mono">
-                {msg.raw_body || "No content."}
+              <div className="mt-3 pt-3 border-t border-border/30">
+                {msg.raw_body ? (
+                  <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                    {stripHtml(msg.raw_body)}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground/50 italic">No content.</p>
+                )}
               </div>
             )}
           </div>

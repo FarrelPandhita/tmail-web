@@ -8,7 +8,7 @@ import { CopyButton } from "@/components/copy-button";
 import { InboxMessageFull } from "@/types";
 import { ChevronDown, ChevronUp, Mail, Code, Globe, Timer } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { cn, detectProvider, getOtpExpiryBadge } from "@/lib/utils";
+import { cn, detectProvider, getOtpExpiryBadge, stripHtml } from "@/lib/utils";
 
 interface SuperadminRawMessageViewerProps {
   messages: InboxMessageFull[];
@@ -119,9 +119,13 @@ export function SuperadminRawMessageViewer({
                     />
                   )}
                 </div>
-                <pre className="text-xs font-mono whitespace-pre-wrap break-all text-foreground/70 max-h-80 overflow-y-auto bg-background/50 p-3 rounded border border-border/30">
-                  {msg.raw_body ?? "(empty body)"}
-                </pre>
+                {msg.raw_body ? (
+                  <p className="text-xs font-mono whitespace-pre-wrap break-words text-foreground/70 max-h-80 overflow-y-auto bg-background/50 p-3 rounded border border-border/30 leading-relaxed">
+                    {stripHtml(msg.raw_body)}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground/40 italic">(empty body)</p>
+                )}
               </div>
             )}
           </div>

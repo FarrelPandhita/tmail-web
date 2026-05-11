@@ -84,3 +84,46 @@ export function getOtpExpiryBadge(receivedAt: string | Date | null) {
   
   return { status: "Fresh", color: "text-green-400 border-green-400/30 bg-green-400/10" };
 }
+
+/**
+ * Strip HTML tags from an email body and return clean readable text.
+ * Handles entities, body tag extraction, and whitespace collapsing.
+ */
+export function stripHtml(html: string | null | undefined): string {
+  if (!html) return "";
+
+  let text = html;
+
+  // Extract only the <body> content if present (skip <head> CSS/JS noise)
+  const bodyMatch = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  if (bodyMatch) {
+    text = bodyMatch[1];
+  }
+
+  // Replace block-level elements with newlines for readability
+  text = text
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<\/div>/gi, "\n")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<\/tr>/gi, "\n")
+    .replace(/<\/h[1-6]>/gi, "\n\n");
+
+  // Strip all remaining HTML tags
+  text = text.replace(/<[^>]+>/g, "");
+
+  // Decode common HTML entities
+  text = text
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
+
+  // Collapse excessive blank lines (max 2 consecutive newlines)
+  text = text.replace(/\n{3,}/g, "\n\n").trim();
+
+  return text;
+}

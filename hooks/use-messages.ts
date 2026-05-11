@@ -21,8 +21,8 @@ export function useMessages() {
     queryKey: ["buyer-messages"],
     queryFn: fetchMessages,
     refetchInterval: 5000,
-    refetchIntervalInBackground: false,
-    staleTime: 4000,
+    refetchIntervalInBackground: true, // Keep polling even when tab is not focused
+    staleTime: 0,
     retry: 2,
   });
 }
