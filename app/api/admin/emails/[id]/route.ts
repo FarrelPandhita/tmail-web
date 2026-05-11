@@ -15,7 +15,8 @@ export async function PATCH(
       return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id: idStr } = await params;
+    const id = parseInt(idStr, 10);
     const body = await req.json();
     const action = body.action as string;
 
@@ -37,7 +38,7 @@ export async function PATCH(
     }
 
     if (action === "reset_password") {
-      const parsed = ResetPasswordSchema.safeParse({ emailId: id, ...body });
+      const parsed = ResetPasswordSchema.safeParse({ emailId: idStr, ...body });
       if (!parsed.success) {
         return NextResponse.json(
           { ok: false, error: parsed.error.issues[0].message },
@@ -61,7 +62,7 @@ export async function PATCH(
     }
 
     if (action === "assign_buyer") {
-      const buyerId = body.buyerId as string | null;
+      const buyerId = body.buyerId ? parseInt(body.buyerId, 10) : null;
       await prisma.generated_emails.update({
         where: { id },
         data: { buyer_id: buyerId },
@@ -87,7 +88,8 @@ export async function GET(
       return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id: idStr } = await params;
+    const id = parseInt(idStr, 10);
     const messages = await prisma.inbox_messages.findMany({
       where: { generated_email_id: id },
       orderBy: { received_at: "desc" },
@@ -101,7 +103,7 @@ export async function GET(
         sender: m.sender,
         subject: m.subject,
         otp_code: m.otp_code,
-        received_at: m.received_at.toISOString(),
+        received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
         has_body: !!m.raw_body,
       })),
     });

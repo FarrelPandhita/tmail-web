@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     // Always validate ownership in DB — never trust client
     const generatedEmail = await prisma.generated_emails.findFirst({
       where: {
-        id: session.sub,
+        id: Number(session.sub),
         is_active: true,
       },
     });
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     // Separate query for otp_cache (one-to-one via unique FK)
     const otpCache = await prisma.otp_cache.findFirst({
-      where: { generated_email_id: session.sub },
+      where: { generated_email_id: Number(session.sub) },
     });
 
     return NextResponse.json({

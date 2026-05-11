@@ -54,7 +54,7 @@ export function GeneratorEmailTable({ emails: initialEmails }: GeneratorEmailTab
   const [emails, setEmails] = useState(initialEmails);
   const [createOpen, setCreateOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Create email form state
@@ -97,7 +97,7 @@ export function GeneratorEmailTable({ emails: initialEmails }: GeneratorEmailTab
     }
   }
 
-  async function handleToggle(id: string) {
+  async function handleToggle(id: number) {
     try {
       const res = await fetch(`/api/admin/emails/${id}`, {
         method: "PATCH",

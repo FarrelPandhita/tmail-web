@@ -119,7 +119,7 @@ export default async function SuperadminPage() {
               {recentAuditLogs.map((log) => (
                 <div key={log.id} className="flex items-center gap-3 text-sm py-1.5 border-b border-border/20 last:border-0">
                   <span className="text-muted-foreground/60 font-mono text-xs shrink-0">
-                    {new Date(log.created_at).toLocaleTimeString()}
+                    {log.created_at ? new Date(log.created_at).toLocaleTimeString() : "Unknown"}
                   </span>
                   <span className="text-primary/80 text-xs font-medium shrink-0">{log.action}</span>
                   <span className="text-muted-foreground/70 text-xs truncate">{log.admin.email}</span>
@@ -142,7 +142,7 @@ export default async function SuperadminPage() {
             id: e.id,
             generated_email: e.generated_email,
             is_active: e.is_active,
-            created_at: e.created_at.toISOString(),
+            created_at: e.created_at ? e.created_at.toISOString() : new Date().toISOString(),
             buyer_username: e.buyer?.username ?? null,
             latest_otp: otp?.latest_otp ?? null,
             message_count: e._count.inbox_messages,

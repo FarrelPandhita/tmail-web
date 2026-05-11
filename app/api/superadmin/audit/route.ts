@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
           admin_email: l.admin.email,
           action: l.action,
           target_email: l.target_email,
-          created_at: l.created_at.toISOString(),
+          created_at: l.created_at ? l.created_at.toISOString() : new Date().toISOString(),
         })),
         pagination: {
           page,

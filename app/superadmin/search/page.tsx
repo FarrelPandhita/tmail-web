@@ -23,9 +23,9 @@ export default async function SuperadminSearchPage({
   const query = q?.trim() ?? "";
 
   let emailResults: {
-    id: string;
+    id: number;
     generated_email: string;
-    is_active: boolean;
+    is_active: boolean | null;
     created_at: string;
     buyer_username: string | null;
     latest_otp: string | null;
@@ -33,7 +33,7 @@ export default async function SuperadminSearchPage({
   }[] = [];
 
   let messageResults: {
-    id: string;
+    id: number;
     inbox_email: string;
     sender: string | null;
     subject: string | null;
@@ -75,7 +75,7 @@ export default async function SuperadminSearchPage({
       id: e.id,
       generated_email: e.generated_email,
       is_active: e.is_active,
-      created_at: e.created_at.toISOString(),
+      created_at: e.created_at ? e.created_at.toISOString() : new Date().toISOString(),
       buyer_username: e.buyer?.username ?? null,
       latest_otp: otpMap.get(e.id) ?? null,
       message_count: e._count.inbox_messages,
@@ -87,7 +87,7 @@ export default async function SuperadminSearchPage({
       sender: m.sender,
       subject: m.subject,
       otp_code: m.otp_code,
-      received_at: m.received_at.toISOString(),
+      received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
     }));
   }
 

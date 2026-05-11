@@ -12,7 +12,8 @@ export async function GET(
       return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
     }
 
-    const { emailId } = await params;
+    const { emailId: emailIdStr } = await params;
+    const emailId = parseInt(emailIdStr, 10);
 
     const [email, otpCache] = await Promise.all([
       prisma.generated_emails.findUnique({
@@ -37,7 +38,7 @@ export async function GET(
     // Write audit log — ALL superadmin inbox API views are logged
     await prisma.audit_logs.create({
       data: {
-        admin_id: session.sub,
+        admin_id: Number(session.sub),
         action: "VIEW_INBOX",
         target_email: email.generated_email,
         created_at: new Date(),
@@ -50,7 +51,7 @@ export async function GET(
         id: email.id,
         generated_email: email.generated_email,
         is_active: email.is_active,
-        created_at: email.created_at.toISOString(),
+        created_at: email.created_at ? email.created_at.toISOString() : new Date().toISOString(),
         buyer_username: email.buyer?.username ?? null,
         latest_otp: otpCache?.latest_otp ?? null,
         otp_source: otpCache?.source ?? null,
@@ -62,7 +63,7 @@ export async function GET(
           subject: m.subject,
           otp_code: m.otp_code,
           raw_body: m.raw_body,
-          received_at: m.received_at.toISOString(),
+          received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
         })),
       },
     });

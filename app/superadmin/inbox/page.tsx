@@ -56,7 +56,7 @@ export default async function SuperadminInboxPage({
           id: e.id,
           generated_email: e.generated_email,
           is_active: e.is_active,
-          created_at: e.created_at.toISOString(),
+          created_at: e.created_at ? e.created_at.toISOString() : new Date().toISOString(),
           buyer_username: e.buyer?.username ?? null,
           latest_otp: otpMap.get(e.id) ?? null,
           message_count: e._count.inbox_messages,

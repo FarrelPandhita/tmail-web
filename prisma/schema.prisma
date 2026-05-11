@@ -18,62 +18,70 @@ datasource db {
 }
 
 model admins {
-  id            String       @id @default(uuid())
+  id            Int          @id @default(autoincrement())
   email         String       @unique
   password_hash String
-  role          String       // "superadmin" | "generator_admin"
-  is_superadmin Boolean      @default(false)
-  created_at    DateTime     @default(now())
-  audit_logs    audit_logs[]
+  role          String?      @default("generator_admin")
+  is_superadmin Boolean?     @default(false)
+  created_at    DateTime?    @default(now())
+  
+  audit_logs       audit_logs[]
+  generated_emails generated_emails[] @relation("AdminGeneratedEmails")
 }
 
 model buyers {
-  id               String             @id @default(uuid())
+  id               Int                @id @default(autoincrement())
   username         String             @unique
-  created_at       DateTime           @default(now())
-  is_active        Boolean            @default(true)
+  created_at       DateTime?          @default(now())
+  is_active        Boolean?           @default(true)
+  
   generated_emails generated_emails[]
 }
 
 model generated_emails {
-  id              String          @id @default(uuid())
-  buyer_id        String?
-  generated_email String          @unique
+  id              Int              @id @default(autoincrement())
+  buyer_id        Int?
+  generated_email String           @unique
   password_hash   String
-  is_active       Boolean         @default(true)
-  created_by      String?         // admin id who created
-  created_at      DateTime        @default(now())
-  buyer           buyers?         @relation(fields: [buyer_id], references: [id])
+  is_active       Boolean?         @default(true)
+  created_by      Int?             // admin id who created
+  created_at      DateTime?        @default(now())
+  
+  buyer           buyers?          @relation(fields: [buyer_id], references: [id])
+  admin           admins?          @relation("AdminGeneratedEmails", fields: [created_by], references: [id])
   inbox_messages  inbox_messages[]
   otp_cache       otp_cache[]
 }
 
 model inbox_messages {
-  id                  String           @id @default(uuid())
-  generated_email_id  String
+  id                  Int              @id @default(autoincrement())
+  generated_email_id  Int
   sender              String?
   recipient           String?
   subject             String?
   raw_body            String?
   otp_code            String?
-  received_at         DateTime         @default(now())
+  received_at         DateTime?        @default(now())
+  
   generated_email     generated_emails @relation(fields: [generated_email_id], references: [id])
 }
 
 model otp_cache {
-  id                  String           @id @default(uuid())
-  generated_email_id  String           @unique
+  id                  Int              @id @default(autoincrement())
+  generated_email_id  Int              @unique
   latest_otp          String?
   source              String?
-  updated_at          DateTime         @updatedAt
+  updated_at          DateTime?        @updatedAt
+  
   generated_email     generated_emails @relation(fields: [generated_email_id], references: [id])
 }
 
 model audit_logs {
-  id           String   @id @default(uuid())
-  admin_id     String
+  id           Int       @id @default(autoincrement())
+  admin_id     Int
   action       String
   target_email String?
-  created_at   DateTime @default(now())
-  admin        admins   @relation(fields: [admin_id], references: [id])
+  created_at   DateTime? @default(now())
+  
+  admin        admins    @relation(fields: [admin_id], references: [id])
 }

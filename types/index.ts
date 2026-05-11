@@ -39,7 +39,7 @@ export interface OtpData {
 // ─── Messages ────────────────────────────────────────────────────────────────
 
 export interface InboxMessage {
-  id: string;
+  id: number;
   sender: string | null;
   subject: string | null;
   otp_code: string | null;
@@ -55,9 +55,9 @@ export interface InboxMessageFull extends InboxMessage {
 // ─── Generated Email ─────────────────────────────────────────────────────────
 
 export interface GeneratedEmailSummary {
-  id: string;
+  id: number;
   generated_email: string;
-  is_active: boolean;
+  is_active: boolean | null;
   created_at: string;
   buyer_username: string | null;
   latest_otp: string | null;
@@ -67,9 +67,9 @@ export interface GeneratedEmailSummary {
 // ─── Buyer ───────────────────────────────────────────────────────────────────
 
 export interface BuyerSummary {
-  id: string;
+  id: number;
   username: string;
-  is_active: boolean;
+  is_active: boolean | null;
   created_at: string;
   email_count: number;
 }
@@ -77,7 +77,7 @@ export interface BuyerSummary {
 // ─── Audit Log ───────────────────────────────────────────────────────────────
 
 export interface AuditLogEntry {
-  id: string;
+  id: number;
   admin_email: string;
   action: string;
   target_email: string | null;

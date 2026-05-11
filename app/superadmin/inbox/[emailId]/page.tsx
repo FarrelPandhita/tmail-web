@@ -20,7 +20,8 @@ export default async function SuperadminInboxDetailPage({
   const session = await getSession();
   if (!session || session.role !== "superadmin") redirect("/login");
 
-  const { emailId } = await params;
+  const { emailId: emailIdStr } = await params;
+  const emailId = parseInt(emailIdStr, 10);
 
   const [email, otpCache] = await Promise.all([
     prisma.generated_emails.findUnique({
@@ -44,7 +45,7 @@ export default async function SuperadminInboxDetailPage({
   // Write audit log
   await prisma.audit_logs.create({
     data: {
-      admin_id: session.sub,
+      admin_id: Number(session.sub),
       action: "VIEW_INBOX",
       target_email: email.generated_email,
       created_at: new Date(),
@@ -82,7 +83,7 @@ export default async function SuperadminInboxDetailPage({
               {email._count.inbox_messages} messages total
             </span>
             <span className="text-xs text-muted-foreground">
-              Created {new Date(email.created_at).toLocaleDateString()}
+              Created {email.created_at ? new Date(email.created_at).toLocaleDateString() : "Unknown"}
             </span>
           </div>
         </div>
@@ -154,7 +155,7 @@ export default async function SuperadminInboxDetailPage({
           subject: m.subject,
           otp_code: m.otp_code,
           raw_body: m.raw_body,
-          received_at: m.received_at.toISOString(),
+          received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
           has_body: !!m.raw_body,
         }))}
       />

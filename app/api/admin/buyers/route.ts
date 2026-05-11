@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         id: b.id,
         username: b.username,
         is_active: b.is_active,
-        created_at: b.created_at.toISOString(),
+        created_at: b.created_at ? b.created_at.toISOString() : new Date().toISOString(),
         email_count: b._count.generated_emails,
       })),
     });
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
           id: buyer.id,
           username: buyer.username,
           is_active: buyer.is_active,
-          created_at: buyer.created_at.toISOString(),
+          created_at: buyer.created_at ? buyer.created_at.toISOString() : new Date().toISOString(),
           email_count: 0,
         },
       },

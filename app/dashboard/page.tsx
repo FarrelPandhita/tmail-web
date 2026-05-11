@@ -16,7 +16,7 @@ export default async function BuyerDashboardPage() {
   if (!session || session.role !== "buyer") redirect("/login");
 
   const emailAccount = await prisma.generated_emails.findFirst({
-    where: { id: session.sub },
+    where: { id: Number(session.sub) },
     select: {
       generated_email: true,
       is_active: true,

@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
           buyer_username: e.buyer?.username ?? null,
           latest_otp: otpMap.get(e.id) ?? null,
           message_count: e._count.inbox_messages,
-          created_at: e.created_at.toISOString(),
+          created_at: e.created_at ? e.created_at.toISOString() : new Date().toISOString(),
         })),
         messages: messages.map((m) => ({
           id: m.id,
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
           sender: m.sender,
           subject: m.subject,
           otp_code: m.otp_code,
-          received_at: m.received_at.toISOString(),
+          received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
         })),
       },
     });

@@ -70,7 +70,7 @@ export default async function AuditLogsPage({
                 className="flex items-center gap-4 px-6 py-3 hover:bg-muted/10 transition-colors"
               >
                 <span className="text-[11px] text-muted-foreground/50 font-mono tabular-nums w-36 shrink-0">
-                  {new Date(log.created_at).toLocaleString()}
+                  {log.created_at ? new Date(log.created_at).toLocaleString() : "Unknown"}
                 </span>
                 <Badge
                   variant="outline"

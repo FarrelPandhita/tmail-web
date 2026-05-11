@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
         id: e.id,
         generated_email: e.generated_email,
         is_active: e.is_active,
-        created_at: e.created_at.toISOString(),
+        created_at: e.created_at ? e.created_at.toISOString() : new Date().toISOString(),
         buyer_username: e.buyer?.username ?? null,
         latest_otp: otpMap.get(e.id) ?? null,
         message_count: e._count.inbox_messages,
@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { mode, customEmail, buyerId, password } = parsed.data;
+    const { mode, customEmail, password } = parsed.data;
+    const buyerId = parsed.data.buyerId ? parseInt(parsed.data.buyerId as unknown as string, 10) : null;
 
     let emailAddress: string;
     if (mode === "custom" && customEmail) {
@@ -110,7 +111,7 @@ export async function POST(req: NextRequest) {
         generated_email: emailAddress,
         password_hash,
         buyer_id: buyerId ?? null,
-        created_by: session.sub,
+        created_by: Number(session.sub),
         is_active: true,
       },
     });
@@ -122,7 +123,7 @@ export async function POST(req: NextRequest) {
           id: created.id,
           generated_email: created.generated_email,
           is_active: created.is_active,
-          created_at: created.created_at.toISOString(),
+          created_at: created.created_at ? created.created_at.toISOString() : new Date().toISOString(),
         },
       },
       { status: 201 }

@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
             id: e.id,
             generated_email: e.generated_email,
             is_active: e.is_active,
-            created_at: e.created_at.toISOString(),
+            created_at: e.created_at ? e.created_at.toISOString() : new Date().toISOString(),
             buyer_username: e.buyer?.username ?? null,
             latest_otp: otp?.latest_otp ?? null,
             otp_updated_at: otp?.updated_at?.toISOString() ?? null,
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
               sender: m.sender,
               subject: m.subject,
               otp_code: m.otp_code,
-              received_at: m.received_at.toISOString(),
+              received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
             })),
           };
         }),

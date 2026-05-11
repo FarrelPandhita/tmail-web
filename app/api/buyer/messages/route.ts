@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     // Ownership validated: only messages belonging to this buyer's generated_email
     const generatedEmail = await prisma.generated_emails.findFirst({
       where: {
-        id: session.sub,
+        id: Number(session.sub),
         is_active: true,
       },
     });
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     }
 
     const messages = await prisma.inbox_messages.findMany({
-      where: { generated_email_id: session.sub },
+      where: { generated_email_id: Number(session.sub) },
       orderBy: { received_at: "desc" },
       take: BUYER_MAX_MESSAGES, // HARD server-side limit: cannot be overridden by client
       select: {
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
           sender: m.sender,
           subject: m.subject,
           otp_code: m.otp_code,
-          received_at: m.received_at.toISOString(),
+          received_at: m.received_at ? m.received_at.toISOString() : new Date().toISOString(),
           has_body: true,
         })),
         email: generatedEmail.generated_email,

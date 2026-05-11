@@ -17,7 +17,7 @@ interface SuperadminRawMessageViewerProps {
 export function SuperadminRawMessageViewer({
   messages,
 }: SuperadminRawMessageViewerProps) {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   return (
     <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
